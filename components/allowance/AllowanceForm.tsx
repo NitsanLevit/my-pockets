@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { computeInitialNextRunDate, weekdayName } from "@/lib/allowance/schedule";
-import type { AllowanceFrequency } from "@/lib/supabase/types";
+import type { AllowanceFrequency, PocketType } from "@/lib/supabase/types";
 
 type ExistingConfig = {
   id: string;
@@ -23,13 +24,19 @@ type ExistingConfig = {
 export function AllowanceForm({
   childId,
   existing,
+  enabledTypes,
 }: {
   childId: string;
   existing: ExistingConfig | null;
+  enabledTypes: PocketType[];
 }) {
   const t = useTranslations("allowance");
+  const pocketsT = useTranslations("pockets");
   const locale = useLocale();
   const router = useRouter();
+  const spendEnabled = enabledTypes.includes("spend");
+  const savingsEnabled = enabledTypes.includes("savings");
+  const investmentsEnabled = enabledTypes.includes("investments");
   const [spend, setSpend] = useState(String(existing?.spend_amount ?? 1));
   const [savings, setSavings] = useState(String(existing?.savings_amount ?? 1));
   const [investments, setInvestments] = useState(
@@ -49,12 +56,22 @@ export function AllowanceForm({
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  const spendN = parseFloat(spend) || 0;
-  const savingsN = parseFloat(savings) || 0;
-  const investmentsN = parseFloat(investments) || 0;
+  useEffect(() => {
+    if (!success) return;
+    const timer = setTimeout(() => setSuccess(false), 3000);
+    return () => clearTimeout(timer);
+  }, [success]);
+
+  const spendN = spendEnabled ? parseFloat(spend) || 0 : 0;
+  const savingsN = savingsEnabled ? parseFloat(savings) || 0 : 0;
+  const investmentsN = investmentsEnabled ? parseFloat(investments) || 0 : 0;
   const total = spendN + savingsN + investmentsN;
-  const belowMin = spendN < 1 || savingsN < 1 || investmentsN < 1;
+  const belowMin =
+    (spendEnabled && spendN < 1) ||
+    (savingsEnabled && savingsN < 1) ||
+    (investmentsEnabled && investmentsN < 1);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -64,6 +81,7 @@ export function AllowanceForm({
     }
     setBusy(true);
     setError(null);
+    setSuccess(false);
 
     const supabase = createClient();
     const {
@@ -101,20 +119,37 @@ export function AllowanceForm({
       setError(dbError.message);
       return;
     }
+    setSuccess(true);
     router.refresh();
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-3">
-        <AmountField label={t("spendSplit")} value={spend} onChange={setSpend} />
-        <AmountField label={t("savingsSplit")} value={savings} onChange={setSavings} />
-        <AmountField
-          label={t("investSplit")}
-          value={investments}
-          onChange={setInvestments}
-        />
-      </div>
+      {enabledTypes.length === 0 ? (
+        <p className="text-sm text-foreground/78">{pocketsT("noPocketsEnabled")}</p>
+      ) : (
+        <div
+          className={`grid grid-cols-1 gap-3 ${
+            { 1: "xs:grid-cols-1", 2: "xs:grid-cols-2", 3: "xs:grid-cols-3" }[
+              enabledTypes.length
+            ]
+          }`}
+        >
+          {spendEnabled && (
+            <AmountField label={t("spendSplit")} value={spend} onChange={setSpend} />
+          )}
+          {savingsEnabled && (
+            <AmountField label={t("savingsSplit")} value={savings} onChange={setSavings} />
+          )}
+          {investmentsEnabled && (
+            <AmountField
+              label={t("investSplit")}
+              value={investments}
+              onChange={setInvestments}
+            />
+          )}
+        </div>
+      )}
 
       <p className="text-sm text-foreground/78">
         {t("totalAmount")}: ₪{total.toFixed(2)}
@@ -188,6 +223,12 @@ export function AllowanceForm({
 
       {belowMin && <p className="text-sm text-danger">{t("minError")}</p>}
       {error && <p className="text-sm text-danger">{error}</p>}
+      {success && (
+        <p className="flex items-center gap-1.5 text-sm font-medium text-success">
+          <CheckCircle2 className="h-4 w-4" aria-hidden />
+          {existing ? t("updateSuccess") : t("startSuccess")}
+        </p>
+      )}
 
       <button type="submit" disabled={busy} className="btn-primary">
         {existing ? t("update") : t("start")}

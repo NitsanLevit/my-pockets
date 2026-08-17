@@ -108,7 +108,9 @@
     "minError": "Each pocket needs at least ₪1.",
     "sumError": "The split must add up to the total amount.",
     "update": "Update allowance",
-    "start": "Start allowance"
+    "start": "Start allowance",
+    "updateSuccess": "Allowance updated!",
+    "startSuccess": "Allowance started!"
   },
   "investments": {
     "pageTitle": "Investments",

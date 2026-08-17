@@ -16,7 +16,7 @@ export default async function RequestsInboxPage() {
 
   const { data: pending } = await supabase
     .from("transactions")
-    .select("id, child_id, type, amount, status, description, created_at")
+    .select("id, child_id, type, pocket_type, amount, status, description, created_at")
     .eq("family_id", profile!.family_id!)
     .eq("type", "withdrawal")
     .eq("status", "pending")
@@ -31,6 +31,7 @@ export default async function RequestsInboxPage() {
   const items: ActivityItem[] = (pending ?? []).map((tx) => ({
     id: tx.id,
     type: tx.type,
+    pocket_type: tx.pocket_type,
     amount: tx.amount,
     status: tx.status,
     description: tx.description,

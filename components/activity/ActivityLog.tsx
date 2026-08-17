@@ -4,17 +4,24 @@ import { useState } from "react";
 import { useTranslations, useFormatter } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Pencil, Check, X } from "lucide-react";
-import type { TransactionType } from "@/lib/supabase/types";
+import { Pencil, Check, X, Wallet, PiggyBank, TrendingUp } from "lucide-react";
+import type { PocketType, TransactionType } from "@/lib/supabase/types";
 
 export type ActivityItem = {
   id: string;
   type: TransactionType;
+  pocket_type: PocketType;
   amount: number;
   status: "pending" | "completed" | "rejected";
   description: string | null;
   created_at: string;
   childName?: string;
+};
+
+const POCKET_ICONS: Record<PocketType, typeof Wallet> = {
+  spend: Wallet,
+  savings: PiggyBank,
+  investments: TrendingUp,
 };
 
 export function ActivityLog({
@@ -56,8 +63,10 @@ function ActivityRow({
   canApprove: boolean;
 }) {
   const t = useTranslations("activity");
+  const pocketsT = useTranslations("pockets");
   const format = useFormatter();
   const router = useRouter();
+  const PocketIcon = POCKET_ICONS[item.pocket_type];
   const [editing, setEditing] = useState(false);
   const [description, setDescription] = useState(item.description ?? "");
   const [busy, setBusy] = useState(false);
@@ -87,8 +96,12 @@ function ActivityRow({
   return (
     <div className="flex items-center justify-between gap-3 py-3">
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium">
+        <p className="flex items-center gap-1.5 text-sm font-medium">
+          <PocketIcon className="h-3.5 w-3.5 shrink-0 text-foreground/65" aria-hidden />
           {t(item.type)}
+          <span className="font-normal text-foreground/72">
+            · {pocketsT(item.pocket_type)}
+          </span>
           {item.childName && (
             <span className="font-normal text-foreground/72"> · {item.childName}</span>
           )}

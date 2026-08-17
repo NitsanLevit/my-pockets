@@ -31,7 +31,7 @@ export default async function MyPocketsPage() {
         .maybeSingle(),
       supabase
         .from("transactions")
-        .select("id, type, amount, status, description, created_at")
+        .select("id, type, pocket_type, amount, status, description, created_at")
         .eq("child_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(30),
@@ -55,6 +55,7 @@ export default async function MyPocketsPage() {
   const items: ActivityItem[] = (transactions ?? []).map((tx) => ({
     id: tx.id,
     type: tx.type,
+    pocket_type: tx.pocket_type,
     amount: tx.amount,
     status: tx.status,
     description: tx.description,

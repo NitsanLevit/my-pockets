@@ -68,6 +68,7 @@ export default async function KidDetailPage({
   const items: ActivityItem[] = (transactions ?? []).map((tx) => ({
     id: tx.id,
     type: tx.type,
+    pocket_type: tx.pocket_type,
     amount: tx.amount,
     status: tx.status,
     description: tx.description,

@@ -62,7 +62,13 @@ export function KidActionsMenu({
       key: "allowance" as const,
       label: allowanceT("title"),
       icon: PiggyBank,
-      panel: <AllowanceForm childId={childId} existing={existingAllowance} />,
+      panel: (
+        <AllowanceForm
+          childId={childId}
+          existing={existingAllowance}
+          enabledTypes={enabledTypes}
+        />
+      ),
     },
     {
       key: "pockets" as const,
