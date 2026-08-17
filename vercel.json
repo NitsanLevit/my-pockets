@@ -1,0 +1,7 @@
+{
+  "crons": [
+    { "path": "/api/cron/allowances", "schedule": "0 3 * * *" },
+    { "path": "/api/cron/savings-bonus", "schedule": "30 3 * * *" },
+    { "path": "/api/cron/market-rate", "schedule": "0 4 * * *" }
+  ]
+}

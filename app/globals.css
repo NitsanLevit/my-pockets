@@ -1,26 +1,143 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Dark page canvas; every card/panel sits on top as a light surface, so
+     no border is needed to tell them apart from the page — the light/dark
+     contrast does that on its own. --card-* are the text/muted/border
+     values used *inside* a light surface (see .on-light below); the plain
+     --foreground/--surface-muted/--border above them are for content that
+     sits directly on the dark page (header, nav, banners). */
+  --background: #101a30;
+  --foreground: #eef2fb;
+  --surface: #faf6ee;
+  --surface-muted: #1a2540;
+  --border: #33456b;
+
+  --card-foreground: #16213e;
+  --card-muted: #dce9f8;
+  --card-border: #b9cfe8;
+
+  /* Primary: blue, spanning light to near-black shades */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-900: #1e3a8a;
+
+  /* Secondary: teal, the only other decorative color */
+  --color-teal-100: #ccfbf1;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-800: #115e59;
+
+  /* Status colors (errors, "pending"/"active"/"applied" badges) — functional,
+     not part of the 2-color decorative palette above. */
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+}
+
+@theme {
+  /* Narrow-phone breakpoint (iPhone SE and up) — lets header/nav content
+     drop non-essential bits (wordmark text, button labels) before it's
+     forced to wrap or overflow on the smallest real devices. */
+  --breakpoint-xs: 26.25rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+
+  --color-brand-50: var(--color-brand-50);
+  --color-brand-100: var(--color-brand-100);
+  --color-brand-400: var(--color-brand-400);
+  --color-brand-500: var(--color-brand-500);
+  --color-brand-600: var(--color-brand-600);
+  --color-brand-700: var(--color-brand-700);
+  --color-brand-900: var(--color-brand-900);
+
+  --color-teal-100: var(--color-teal-100);
+  --color-teal-400: var(--color-teal-400);
+  --color-teal-500: var(--color-teal-500);
+  --color-teal-600: var(--color-teal-600);
+  --color-teal-800: var(--color-teal-800);
+
+  --color-gold-400: var(--color-gold-400);
+  --color-gold-500: var(--color-gold-500);
+  --color-gold-600: var(--color-gold-600);
+
+  --color-success: var(--color-success);
+  --color-danger: var(--color-danger);
+
+  --font-sans: var(--font-app);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  /* Scales every rem-based Tailwind text size (text-xs, text-sm, ...)
+     up together, keeping the size hierarchy intact. */
+  font-size: 107%;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 460;
+}
+
+* {
+  min-width: 0;
+}
+
+[dir="rtl"] .flip-rtl {
+  transform: scaleX(-1);
+}
+
+@layer components {
+  /* Re-scopes the shared foreground/muted/border tokens to their
+     light-surface values for everything inside — apply on any element
+     whose own background is --surface (light), so text drawn with
+     text-foreground/bg-surface-muted/border-border automatically comes
+     out right without touching each usage individually. */
+  .on-light {
+    --foreground: var(--card-foreground);
+    --surface-muted: var(--card-muted);
+    --border: var(--card-border);
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-border bg-surface-muted px-3 py-2 text-foreground outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-brand-700 disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    --foreground: var(--card-foreground);
+    --surface-muted: var(--card-muted);
+    --border: var(--card-border);
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-surface px-5 py-2.5 font-medium text-foreground transition-colors hover:bg-surface-muted disabled:opacity-60;
+  }
+
+  .card {
+    --foreground: var(--card-foreground);
+    --surface-muted: var(--card-muted);
+    --border: var(--card-border);
+    @apply rounded-2xl bg-surface p-5 text-foreground shadow-lg;
+  }
 }
