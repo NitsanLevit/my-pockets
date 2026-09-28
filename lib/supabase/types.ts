@@ -164,6 +164,16 @@ export interface Database {
         },
         { family_id: string; rate_pct: number; source: RateSource }
       >;
+      push_subscriptions: Table<
+        {
+          endpoint: string;
+          profile_id: string;
+          p256dh: string;
+          auth: string;
+          created_at: string;
+        },
+        { endpoint: string; profile_id: string; p256dh: string; auth: string }
+      >;
       webauthn_credentials: Table<
         {
           id: string;

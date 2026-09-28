@@ -129,6 +129,18 @@
   "withdrawal": {
     "title": "בקשה לכסף",
     "whatFor": "בשביל מה? (לא חובה)",
-    "sendRequest": "שליחת בקשה"
+    "sendRequest": "שליחת בקשה",
+    "notificationTitle": "בקשת משיכה חדשה",
+    "notificationBody": "{name} ביקש/ה {currency}{amount} מ{pocket}",
+    "notificationBodyWithNote": "{name} ביקש/ה {currency}{amount} מ{pocket} — {note}"
+  },
+  "pushNotifications": {
+    "enable": "הפעלת התראות על בקשות משיכה",
+    "enabling": "מפעיל…",
+    "enabled": "התראות מופעלות במכשיר הזה",
+    "disable": "כיבוי במכשיר הזה",
+    "unsupported": "התראות לא נתמכות בדפדפן הזה",
+    "permissionDenied": "התראות חסומות לאתר הזה — בדקו את הגדרות הדפדפן",
+    "error": "לא הצלחנו להפעיל התראות, נסו שוב"
   }
 }

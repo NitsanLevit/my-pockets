@@ -20,7 +20,7 @@ export function WithdrawalRequestForm({ available }: { available: number }) {
     setError(null);
 
     const supabase = createClient();
-    const { error: rpcError } = await supabase.rpc("request_withdrawal", {
+    const { data: transactionId, error: rpcError } = await supabase.rpc("request_withdrawal", {
       p_amount: parseFloat(amount),
       p_description: description || null,
     });
@@ -33,6 +33,15 @@ export function WithdrawalRequestForm({ available }: { available: number }) {
     setAmount("");
     setDescription("");
     router.refresh();
+
+    // Best-effort push notification to family admins — the request itself
+    // is already saved above, so a failure here must never surface to the
+    // child or block the form reset.
+    fetch("/api/push/notify-withdrawal-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transactionId }),
+    }).catch(() => {});
   }
 
   return (

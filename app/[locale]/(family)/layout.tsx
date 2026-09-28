@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Logo } from "@/components/logo/Logo";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { LanguageToggle } from "@/components/nav/LanguageToggle";
+import { PushNotificationsToggle } from "@/components/push/PushNotificationsToggle";
 import { Link } from "@/i18n/navigation";
 
 export default async function FamilyLayout({
@@ -48,6 +49,7 @@ export default async function FamilyLayout({
       <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-border px-4 py-3 sm:px-6 sm:py-4">
         <Logo withWordmark />
         <div className="flex items-center gap-2 sm:gap-3">
+          <PushNotificationsToggle />
           <LanguageToggle />
           <SignOutButton />
         </div>
